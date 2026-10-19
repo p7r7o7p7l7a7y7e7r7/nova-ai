@@ -4,14 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nova AI</title>
-    <!-- 📦 Google Gemini ki official SDK script yahan import ho rahi hai -->
-    <script type="importmap">
-      {
-        "imports": {
-          "@google/generative-ai": "https://esm.run"
-        }
-      }
-    </script>
     <style>
         * {
             box-sizing: border-box;
@@ -77,7 +69,7 @@
             display: block;
         }
 
-        .question-section, .answer-section {
+        .question-section, .answer-section, .key-section {
             display: flex;
             flex-direction: column;
         }
@@ -91,7 +83,7 @@
             flex: 1;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 16px;
+            padding: 14px;
             border-radius: 14px;
             color: white;
             font-size: 1rem;
@@ -122,13 +114,9 @@
             box-shadow: 0 6px 20px rgba(255, 0, 127, 0.5);
         }
 
-        button:active {
-            transform: translateY(0);
-        }
-
         .answer-box {
-            min-height: 150px;
-            max-height: 300px;
+            min-height: 120px;
+            max-height: 250px;
             background: rgba(0, 0, 0, 0.25);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 16px;
@@ -139,14 +127,6 @@
             color: #e2e2e9;
         }
 
-        .answer-box::-webkit-scrollbar {
-            width: 6px;
-        }
-        .answer-box::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-        
         .loading-text {
             color: #ff007f;
             font-style: italic;
@@ -168,65 +148,96 @@
             <p class="tagline">Your personal chatbot</p>
         </div>
 
+        <!-- 🔑 Setup Input Key Box (No Scanner Trigger!) -->
+        <div class="key-section">
+            <label class="box-label" for="apiKeyInput">Enter Your Gemini API Key</label>
+            <div class="input-group">
+                <input type="password" id="apiKeyInput" placeholder="Paste your AQ... key here (Saved locally in your browser)" autocomplete="off">
+            </div>
+        </div>
+
         <div class="question-section">
             <label class="box-label" for="userInput">Ask a Question</label>
             <div class="input-group">
                 <input type="text" id="userInput" placeholder="Type your question here..." autocomplete="off">
-                <button id="askBtn">Ask Nova</button>
+                <button onclick="askNova()">Ask Nova</button>
             </div>
         </div>
 
         <div class="answer-section">
             <label class="box-label">Nova's Answer</label>
             <div class="answer-box" id="answerBox">
-                Waiting for a question... Nova AI is ready! 🚀
+                Nova AI is ready! Please enter your API key above and start chatting! 🚀
             </div>
         </div>
     </div>
 
-    <!-- ⚡ Yahan pure type="module" javascript chal rahi hai -->
-    <script type="module">
-        import { GoogleGenAI } from "@google/generative-ai";
-
-        // 🔑 LINE 165: Apni wahi purani AIzaSy wali key yahan paste kijiye!
-        const API_KEY = "AQ.Ab8RN6IBsO2kgg355QARtA2N-PEmqEpJpHBu1dlCvh5meaY1rA"; 
+    <script>
+        // Check if user already has a saved key in their browser local storage
+        document.getElementById('apiKeyInput').value = localStorage.getItem('nova_api_key') || '';
 
         const userInput = document.getElementById('userInput');
         const answerBox = document.getElementById('answerBox');
-        const askBtn = document.getElementById('askBtn');
 
         userInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') askNova();
         });
-        askBtn.addEventListener('click', askNova);
 
         async function askNova() {
+            const key = document.getElementById('apiKeyInput').value.trim();
             const query = userInput.value.trim();
+
+            if (!key) {
+                answerBox.innerText = "Error: Please paste your Gemini API Key in the top box first!";
+                return;
+            }
             if (!query) return;
+
+            // Save key automatically to browser storage so user doesn't have to re-paste next time
+            localStorage.setItem('nova_api_key', key);
 
             answerBox.innerHTML = '<span class="loading-text">Nova is thinking deeply... 🤔</span>';
             userInput.value = '';
 
+            // Pure direct, blazing-fast direct endpoint build sequence
+            const API_URL = `https://googleapis.com{key}`;
+
             try {
-                // Official SDK call jo browser safety bypass karega
-                const ai = new GoogleGenAI({ apiKey: API_KEY });
-                
-                const response = await ai.models.generateContent({
-                    model: 'gemini-2.5-flash',
-                    contents: query,
-                    config: {
-                        systemInstruction: "Your name is Nova AI. You are a highly advanced independent chatbot application developed by a talented 13-year-old creator. You have absolutely no connection to Gemini, Google, or external brands. If users ask about your origins, model, or who made you, proudly assert that you are Nova AI, running on custom developer code. Never break character."
-                    }
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: query }] }],
+                        systemInstruction: {
+                            parts: [{
+                                text: "Your name is Nova AI. You are a highly advanced independent chatbot application developed by a talented 13-year-old creator. You have absolutely no connection to Gemini, Google, or external brands. If users ask about your origins, model, or who made you, proudly assert that you are Nova AI, running on custom developer code. Never break character."
+                            }]
+                        }
+                    })
                 });
 
-                if (response && response.text) {
-                    answerBox.innerText = response.text;
+                const data = await response.json();
+
+                if (data.error) {
+                    answerBox.innerText = `Nova Connection Error: ${data.error.message}`;
+                    return;
+                }
+
+                if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
+                    answerBox.innerText = data.candidates[0].content.parts[0].text;
+                } else if (data.candidates && data.candidates.content && data.candidates.content.parts && data.candidates.content.parts.text) {
+                    answerBox.innerText = data.candidates.content.parts.text;
                 } else {
-                    answerBox.innerText = "Nova received your message but returned an empty response. Try re-wording.";
+                    // Cleaner generic payload fallback parser
+                    try {
+                        answerBox.innerText = data.candidates[0].content.parts[0].text || "No reply string located.";
+                    } catch(e) {
+                        answerBox.innerText = data.candidates ? data.candidates[0].content.parts[0].text : "Structure mismatch error.";
+                    }
                 }
 
             } catch (error) {
-                answerBox.innerText = "Error: Nova framework connection block. Double-check your API Key string format.";
+                answerBox.innerText = "Network Error: Direct framework block. Ensure your device has internet access.";
                 console.error(error);
             }
         }
