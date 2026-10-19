@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚡ My Custom Gemini AI ⚡</title>
+    <title>Nova AI</title>
     <style>
-        /* 🌈 Colorful Neon Styling */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -14,227 +13,225 @@
         }
 
         body {
-            background: linear-gradient(135deg, #0f0c20 0%, #15102a 50%, #061726 100%);
+            background: linear-gradient(135deg, #09070f 0%, #110b22 50%, #050b14 100%);
             color: #ffffff;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
+            padding: 20px;
         }
 
-        .chat-container {
-            width: 90%;
-            max-width: 500px;
-            height: 85vh;
-            background: rgba(255, 255, 255, 0.03);
-            border: 2px solid rgba(255, 255, 255, 0.1);
+        .app-container {
+            width: 100%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 2px solid rgba(127, 0, 255, 0.2);
             border-radius: 24px;
-            display: flex;
-            flex-direction: column;
+            padding: 30px;
             backdrop-filter: blur(20px);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37),
-                        0 0 20px rgba(0, 242, 254, 0.15);
-            overflow: hidden;
-        }
-
-        /* Header */
-        .chat-header {
-            background: linear-gradient(90deg, #ff007f, #7f00ff, #00f2fe);
-            background-size: 200% auto;
-            animation: gradientMove 5s ease infinite;
-            padding: 20px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 1.3rem;
-            letter-spacing: 1px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        @keyframes gradientMove {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* Chat History Window */
-        .chat-box {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 30px rgba(127, 0, 255, 0.1);
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 25px;
         }
 
-        /* Custom Scrollbar */
-        .chat-box::-webkit-scrollbar {
-            width: 6px;
-        }
-        .chat-box::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
+        /* Branding Header */
+        .branding {
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 20px;
         }
 
-        /* Message Bubbles */
-        .message {
-            max-width: 80%;
-            padding: 12px 18px;
-            border-radius: 18px;
-            font-size: 0.95rem;
-            line-height: 1.4;
-            animation: popIn 0.3s ease-out forwards;
+        .title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #ff007f, #7f00ff, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
         }
 
-        @keyframes popIn {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+        .tagline {
+            font-size: 1rem;
+            color: #a0a0b8;
+            letter-spacing: 1px;
         }
 
-        .user-message {
-            background: linear-gradient(135deg, #00f2fe, #4facfe);
-            color: #000;
-            align-self: flex-end;
-            border-bottom-right-radius: 4px;
-            box-shadow: 0 4px 10px rgba(0, 242, 254, 0.3);
+        /* Dedicated Boxes Styling */
+        .box-label {
+            font-size: 0.9rem;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #00f2fe;
+            margin-bottom: 8px;
+            display: block;
         }
 
-        .ai-message {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            align-self: flex-start;
-            border-bottom-left-radius: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .system-message {
-            background: #ff4757;
-            color: white;
-            align-self: center;
-            font-size: 0.8rem;
-            border-radius: 8px;
-        }
-
-        /* Input Form Bar */
-        .input-area {
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.2);
+        .question-section, .answer-section {
             display: flex;
-            gap: 10px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            flex-direction: column;
+        }
+
+        /* Question Box Elements */
+        .input-group {
+            display: flex;
+            gap: 12px;
         }
 
         input {
             flex: 1;
-            background: rgba(255, 255, 255, 0.07);
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 14px;
+            padding: 16px;
             border-radius: 14px;
             color: white;
             font-size: 1rem;
             outline: none;
-            transition: 0.2s;
+            transition: 0.3s;
         }
 
         input:focus {
-            border-color: #00f2fe;
-            box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+            border-color: #7f00ff;
+            box-shadow: 0 0 15px rgba(127, 0, 255, 0.3);
         }
 
         button {
             background: linear-gradient(135deg, #ff007f, #7f00ff);
             color: white;
             border: none;
-            padding: 0 20px;
+            padding: 0 25px;
             border-radius: 14px;
             font-weight: bold;
+            font-size: 1rem;
             cursor: pointer;
             transition: 0.2s;
-            box-shadow: 0 4px 10px rgba(255, 0, 127, 0.2);
+            box-shadow: 0 4px 15px rgba(255, 0, 127, 0.3);
         }
 
         button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(255, 0, 127, 0.4);
+            box-shadow: 0 6px 20px rgba(255, 0, 127, 0.5);
         }
 
         button:active {
             transform: translateY(0);
         }
+
+        /* Answer Box Elements */
+        .answer-box {
+            min-height: 150px;
+            max-height: 300px;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 20px;
+            overflow-y: auto;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #e2e2e9;
+        }
+
+        .answer-box::-webkit-scrollbar {
+            width: 6px;
+        }
+        .answer-box::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        .loading-text {
+            color: #ff007f;
+            font-style: italic;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="chat-container">
-        <div class="chat-header">⚡ MY ULTRA AI BOT ⚡</div>
-        <div class="chat-box" id="chatBox">
-            <div class="message ai-message">Hey there! Ask me anything, I'm lightning fast! 🚀</div>
+    <div class="app-container">
+        <!-- Branding Header -->
+        <div class="branding">
+            <h1 class="title">Nova AI</h1>
+            <p class="tagline">Your personal chatbot</p>
         </div>
-        <div class="input-area">
-            <input type="text" id="userInput" placeholder="Type something cool..." autocomplete="off">
-            <button onclick="sendMessage()">Send</button>
+
+        <!-- Question Box Container -->
+        <div class="question-section">
+            <label class="box-label" for="userInput">Ask a Question</label>
+            <div class="input-group">
+                <input type="text" id="userInput" placeholder="Type your question here..." autocomplete="off">
+                <button onclick="askNova()">Ask Nova</button>
+            </div>
+        </div>
+
+        <!-- Answer Box Container -->
+        <div class="answer-section">
+            <label class="box-label">Nova's Answer</label>
+            <div class="answer-box" id="answerBox">
+                Waiting for a question... Nova AI is ready! 🚀
+            </div>
         </div>
     </div>
 
     <script>
-        // 🔑 YOUR KEY IS PLACED HERE AUTOMATICALLY
         const API_KEY = "AQ.Ab8RN6IQBmm9zx96VI68-N-9FeGzQ81YdPXwNbSp_x0kTsnhkA"; 
-        
-        // Connects to Gemini 2.5 Flash
         const API_URL = `https://googleapis.com{API_KEY}`;
 
-        const chatBox = document.getElementById('chatBox');
         const userInput = document.getElementById('userInput');
+        const answerBox = document.getElementById('answerBox');
 
         userInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') sendMessage();
+            if (e.key === 'Enter') askNova();
         });
 
-        async function sendMessage() {
-            const text = userInput.value.trim();
-            if (!text) return;
+        async function askNova() {
+            const query = userInput.value.trim();
+            if (!query) return;
 
-            appendMessage(text, 'user-message');
+            // Display loading state inside answer box
+            answerBox.innerHTML = '<span class="loading-text">Nova is thinking deeply... 🤔</span>';
             userInput.value = '';
-
-            const loadingDiv = appendMessage("Thinking... 🤔", 'ai-message');
 
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: text }] }]
+                        contents: [{ parts: [{ text: query }] }],
+                        // 🧠 System instruction forces the identity branding as Nova AI
+                        systemInstruction: {
+                            parts: [{
+                                text: "Your name is Nova AI. You are a highly advanced independent chatbot application developed by a talented 13-year-old creator. You have absolutely no connection to Gemini, Google, or external brands. If users ask about your origins, model, or who made you, proudly assert that you are Nova AI, running on custom developer code. Never break character."
+                            }]
+                        }
                     })
                 });
 
                 const data = await response.json();
-                loadingDiv.remove();
 
-                if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0].text) {
-                    const aiResponse = data.candidates[0].content.parts[0].text;
-                    appendMessage(aiResponse, 'ai-message');
+                if (data.candidates && data.candidates.content && data.candidates.content.parts && data.candidates.content.parts[0].text) {
+                    const novaReply = data.candidates.content.parts[0].text;
+                    answerBox.innerText = novaReply;
                 } else {
-                    appendMessage("Oops, something went wrong with the AI structure.", 'system-message');
+                    answerBox.innerText = "Nova ran into a processing hiccup. Please try asking again!";
                 }
 
             } catch (error) {
-                loadingDiv.remove();
-                appendMessage("Error: Make sure your API Key is correct!", 'system-message');
+                answerBox.innerText = "Error: Nova could not reach its core network framework. Check your connection status.";
                 console.error(error);
             }
-        }
-
-        function appendMessage(text, className) {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `message ${className}`;
-            msgDiv.innerText = text;
-            chatBox.appendChild(msgDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-            return msgDiv;
         }
     </script>
 </body>
 </html>
+
