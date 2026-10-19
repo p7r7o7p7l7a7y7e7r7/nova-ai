@@ -36,7 +36,6 @@
             gap: 25px;
         }
 
-        /* Branding Header */
         .branding {
             text-align: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -60,7 +59,6 @@
             letter-spacing: 1px;
         }
 
-        /* Dedicated Boxes Styling */
         .box-label {
             font-size: 0.9rem;
             font-weight: 600;
@@ -76,7 +74,6 @@
             flex-direction: column;
         }
 
-        /* Question Box Elements */
         .input-group {
             display: flex;
             gap: 12px;
@@ -121,7 +118,6 @@
             transform: translateY(0);
         }
 
-        /* Answer Box Elements */
         .answer-box {
             min-height: 150px;
             max-height: 300px;
@@ -159,13 +155,11 @@
 <body>
 
     <div class="app-container">
-        <!-- Branding Header -->
         <div class="branding">
             <h1 class="title">Nova AI</h1>
             <p class="tagline">Your personal chatbot</p>
         </div>
 
-        <!-- Question Box Container -->
         <div class="question-section">
             <label class="box-label" for="userInput">Ask a Question</label>
             <div class="input-group">
@@ -174,7 +168,6 @@
             </div>
         </div>
 
-        <!-- Answer Box Container -->
         <div class="answer-section">
             <label class="box-label">Nova's Answer</label>
             <div class="answer-box" id="answerBox">
@@ -184,8 +177,13 @@
     </div>
 
     <script>
-        const API_KEY = "AQ.Ab8RN6IQBmm9zx96VI68-N-9FeGzQ81YdPXwNbSp_x0kTsnhkA"; 
-        const API_URL = `https://googleapis.com{API_KEY}`;
+        // 🔑 POP YOUR KEY HERE (Older AIzaSy key is highly recommended!)
+        const API_KEY = "AQ.Ab8RN6IBsO2kgg355QARtA2N-PEmqEpJpHBu1dlCvh5meaY1rA"; 
+        
+        // 🌐 Using a free public proxy server to route past browser blocks
+        const PROXY_URL = "https://corsproxy.io?";
+        const BASE_URL = `https://googleapis.com{API_KEY}`;
+        const FULL_API_URL = PROXY_URL + encodeURIComponent(BASE_URL);
 
         const userInput = document.getElementById('userInput');
         const answerBox = document.getElementById('answerBox');
@@ -198,17 +196,15 @@
             const query = userInput.value.trim();
             if (!query) return;
 
-            // Display loading state inside answer box
             answerBox.innerHTML = '<span class="loading-text">Nova is thinking deeply... 🤔</span>';
             userInput.value = '';
 
             try {
-                const response = await fetch(API_URL, {
+                const response = await fetch(FULL_API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         contents: [{ parts: [{ text: query }] }],
-                        // 🧠 System instruction forces the identity branding as Nova AI
                         systemInstruction: {
                             parts: [{
                                 text: "Your name is Nova AI. You are a highly advanced independent chatbot application developed by a talented 13-year-old creator. You have absolutely no connection to Gemini, Google, or external brands. If users ask about your origins, model, or who made you, proudly assert that you are Nova AI, running on custom developer code. Never break character."
@@ -219,19 +215,24 @@
 
                 const data = await response.json();
 
-                if (data.candidates && data.candidates.content && data.candidates.content.parts && data.candidates.content.parts[0].text) {
-                    const novaReply = data.candidates.content.parts[0].text;
-                    answerBox.innerText = novaReply;
+                if (data.error) {
+                    answerBox.innerText = `Nova Core Error: ${data.error.message}`;
+                    return;
+                }
+
+                if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
+                    answerBox.innerText = data.candidates[0].content.parts[0].text;
+                } else if (data.candidates && data.candidates.content && data.candidates.content.parts && data.candidates.content.parts.text) {
+                    answerBox.innerText = data.candidates.content.parts.text;
                 } else {
-                    answerBox.innerText = "Nova ran into a processing hiccup. Please try asking again!";
+                    answerBox.innerText = "Nova received your message but the network package structure was unexpected.";
                 }
 
             } catch (error) {
-                answerBox.innerText = "Error: Nova could not reach its core network framework. Check your connection status.";
+                answerBox.innerText = "Error: Nova could not bridge the proxy firewall. Check your API string.";
                 console.error(error);
             }
         }
     </script>
 </body>
 </html>
-
