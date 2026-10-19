@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nova AI</title>
+    <!-- 📦 Google Gemini ki official SDK script yahan import ho rahi hai -->
+    <script type="importmap">
+      {
+        "imports": {
+          "@google/generative-ai": "https://esm.run"
+        }
+      }
+    </script>
     <style>
         * {
             box-sizing: border-box;
@@ -164,7 +172,7 @@
             <label class="box-label" for="userInput">Ask a Question</label>
             <div class="input-group">
                 <input type="text" id="userInput" placeholder="Type your question here..." autocomplete="off">
-                <button onclick="askNova()">Ask Nova</button>
+                <button id="askBtn">Ask Nova</button>
             </div>
         </div>
 
@@ -176,21 +184,21 @@
         </div>
     </div>
 
-    <script>
-        // 🔑 POP YOUR KEY HERE (Older AIzaSy key is highly recommended!)
+    <!-- ⚡ Yahan pure type="module" javascript chal rahi hai -->
+    <script type="module">
+        import { GoogleGenAI } from "@google/generative-ai";
+
+        // 🔑 LINE 165: Apni wahi purani AIzaSy wali key yahan paste kijiye!
         const API_KEY = "AQ.Ab8RN6IBsO2kgg355QARtA2N-PEmqEpJpHBu1dlCvh5meaY1rA"; 
-        
-        // 🌐 Using a free public proxy server to route past browser blocks
-        const PROXY_URL = "https://allorigins.win";
-        const BASE_URL = `https://googleapis.com{API_KEY}`;
-        const FULL_API_URL = PROXY_URL + encodeURIComponent(BASE_URL);
 
         const userInput = document.getElementById('userInput');
         const answerBox = document.getElementById('answerBox');
+        const askBtn = document.getElementById('askBtn');
 
         userInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') askNova();
         });
+        askBtn.addEventListener('click', askNova);
 
         async function askNova() {
             const query = userInput.value.trim();
@@ -200,36 +208,25 @@
             userInput.value = '';
 
             try {
-                const response = await fetch(FULL_API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: query }] }],
-                        systemInstruction: {
-                            parts: [{
-                                text: "Your name is Nova AI. You are a highly advanced independent chatbot application developed by a talented 13-year-old creator. You have absolutely no connection to Gemini, Google, or external brands. If users ask about your origins, model, or who made you, proudly assert that you are Nova AI, running on custom developer code. Never break character."
-                            }]
-                        }
-                    })
+                // Official SDK call jo browser safety bypass karega
+                const ai = new GoogleGenAI({ apiKey: API_KEY });
+                
+                const response = await ai.models.generateContent({
+                    model: 'gemini-2.5-flash',
+                    contents: query,
+                    config: {
+                        systemInstruction: "Your name is Nova AI. You are a highly advanced independent chatbot application developed by a talented 13-year-old creator. You have absolutely no connection to Gemini, Google, or external brands. If users ask about your origins, model, or who made you, proudly assert that you are Nova AI, running on custom developer code. Never break character."
+                    }
                 });
 
-                const data = await response.json();
-
-                if (data.error) {
-                    answerBox.innerText = `Nova Core Error: ${data.error.message}`;
-                    return;
-                }
-
-                if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
-                    answerBox.innerText = data.candidates[0].content.parts[0].text;
-                } else if (data.candidates && data.candidates.content && data.candidates.content.parts && data.candidates.content.parts.text) {
-                    answerBox.innerText = data.candidates.content.parts.text;
+                if (response && response.text) {
+                    answerBox.innerText = response.text;
                 } else {
-                    answerBox.innerText = "Nova received your message but the network package structure was unexpected.";
+                    answerBox.innerText = "Nova received your message but returned an empty response. Try re-wording.";
                 }
 
             } catch (error) {
-                answerBox.innerText = "Error: Nova could not bridge the proxy firewall. Check your API string.";
+                answerBox.innerText = "Error: Nova framework connection block. Double-check your API Key string format.";
                 console.error(error);
             }
         }
